@@ -1,0 +1,37 @@
+name: Compilar APK Kivy
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do Código
+      uses: actions/checkout@v4
+
+    - name: Configurar Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Instalar Dependências do Sistema
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+        sudo apt-get install -y cmake autoconf libtool pkg-config
+
+    - name: Compilar com Buildozer
+      uses: ActionAndroid/buildozer-action@v5
+      with:
+        buildozer_version: stable
+
+    - name: Enviar APK Pronto
+      uses: actions/upload-artifact@v4
+      with:
+        name: MeuApkPredictor
+        path: bin/*.apk
+        
