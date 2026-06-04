@@ -16,7 +16,7 @@ jobs:
     - name: Configurar Python
       uses: actions/setup-python@v5
       with:
-        python-python-version: '3.10'
+        python-version: '3.10'
 
     - name: Instalar Dependencias do Sistema
       run: |
@@ -31,8 +31,16 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Instalar Android SDK Tools Corretos
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | sdkmanager --licenses || true
+        sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
+
     - name: Compilar APK com Buildozer
       run: |
+        export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0
         buildozer android debug
       env:
         ACCEPT_SDK_LICENSE: "y"
@@ -42,4 +50,4 @@ jobs:
       with:
         name: MeuApkPredictor
         path: bin/*.apk
-        
+    
