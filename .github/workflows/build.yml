@@ -13,23 +13,31 @@ jobs:
     - name: Checkout do Codigo
       uses: actions/checkout@v4
 
-    - name: Configurar Java
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-python-version: '3.10'
+
+    - name: Instalar Dependencias do Sistema
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good cmake autoconf libtool pkg-config
+        pip install --upgrade pip
+        pip install buildozer cython virtualenv
+
+    - name: Configurar Java SDK
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Instalar Dependencias
+    - name: Compilar APK com Buildozer
       run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-pip build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good cmake autoconf libtool pkg-config
+        buildozer android debug
+      env:
+        ACCEPT_SDK_LICENSE: "y"
 
-    - name: Compilar com Buildozer
-      uses: ActionAndroid/buildozer-action@v5
-      with:
-        buildozer_version: stable
-
-    - name: Enviar APK
+    - name: Enviar APK Pronto
       uses: actions/upload-artifact@v4
       with:
         name: MeuApkPredictor
